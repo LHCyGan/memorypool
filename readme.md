@@ -37,4 +37,5 @@ make
 ### TODO
 
 - [x]  定长的内存池
+- [x]  支持windows和linux
 - [ ]  高并发内存池
