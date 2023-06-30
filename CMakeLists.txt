@@ -3,4 +3,4 @@ project(memorypool)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(memorypool test.cpp include/common.h include/objectpool.h)
+add_executable(memorypool test.cpp include/common.h include/objectpool.h include/centralcache.h include/threadcache.h threadcache.cpp)
