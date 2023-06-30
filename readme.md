@@ -3,21 +3,6 @@
 ### 项目简介
 **该项目实现了一个高并发内存池，参考了google的开源项目[tmalloc](https://github.com/google/tcmalloc)实现的简易版；其功能就是实现高效的多线程内存管理。由功能可知，高并发指的是高效的多线程，而内存池则是实现内存管理的**
 
-### 编译运行
-```
-mkdir build && cd build
-```
-
-```
-cmake ..
-```
-
-```
-make
-```
-
-
-
 ### 内存池的介绍
 
 - #### 1、池化技术
@@ -48,6 +33,20 @@ make
 
 #### 3.页缓存（page cache）
 页缓存是中心缓存上一级的缓存，存储并分配以页为单位的内存，central cache中没有内存对象时，会从page cache中分配出一定数量的page，并切割成定长大小的小块内存，给central cache。当page cache中一个span的几个跨度页都回收以后，page cache会回收central cache中满足条件的span对象，并且合并相邻的页，组成更大的页，从而缓解内存碎片（外碎片）的问题。
+
+### 编译运行
+```
+mkdir build && cd build
+```
+
+```
+cmake ..
+```
+
+```
+make
+```
+
 
 
 ### TODO
