@@ -4,30 +4,30 @@
 using namespace lh::mp;
 
 namespace lh {
-    namespace mp {
-        class CentralCache {
-        public:
-            static CentralCache* GetInstance() {
-                return &_sInst;
-            }
+	namespace mp {
+		class CentralCache {
+		public:
+			static CentralCache* GetInstance() {
+				return &_sInst;
+			}
 
-            // 鑾峰彇涓�涓潪绌篠pan;
-            Span* GetOneSpan(SpanList& list, size_t byte_size);
+			// 获取一个非空Span;
+			Span* GetOneSpan(SpanList& list, size_t byte_size);
 
-            // 浠嶤entralCache鑾峰彇涓�瀹氭暟閲忕殑鍐呭瓨瀵硅薄缁橳hreadCache
-            size_t FetchRangeObj(void*& start, void*& end, size_t batchNum, size_t size);
+			// 从CentralCache获取一定数量的内存对象给ThreadCache
+			size_t FetchRangeObj(void*& start, void*& end, size_t batchNum, size_t size);
 
-            // 灏嗕竴瀹氭暟閲忕殑瀵硅薄閲婃斁鍒皊pan璺ㄥ害
-            void ReleaseListToSpan(void* start, size_t size);
+			// 将一定数量的对象释放到span跨度
+			void ReleaseListToSpan(void* start, size_t size);
 
-        private:
-            SpanList _spanLists[NFREELIST]; //CentralCache鐨剆pan鍒嗗壊鏂瑰紡涓嶵hreadCache鐩稿悓
+		private:
+			SpanList _spanLists[NFREELIST]; //CentralCache的span分割方式与ThreadCache相同
 
-        private:
-            CentralCache() {}
-            CentralCache(const CentralCache&) = delete;//绂佺敤鎷疯礉
-            static CentralCache _sInst;//鍗曚緥妯″紡
-        };
+		private:
+			CentralCache() {}
+			CentralCache(const CentralCache&) = delete;//禁用拷贝
+			static CentralCache _sInst;//单例模式
+		};
 
-    }
+	}
 }

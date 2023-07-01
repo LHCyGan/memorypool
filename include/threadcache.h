@@ -4,22 +4,22 @@
 using namespace lh::mp;
 
 namespace lh {
-    namespace mp {
+	namespace mp {
 
-        class ThreadCache {
-        public:
-            // ç”³è¯·å’Œé‡Šæ”¾å†…å­˜å¯¹è±¡
-            void* Allocate(size_t size);////ä»Thread Cacheä¸­ç”³è¯·sizeä¸ªBytesçš„ç©ºé—´
-            void DeAllocate(void* ptr, size_t size);
+		class ThreadCache {
+		public:
+			// ÉêÇëºÍÊÍ·ÅÄÚ´æ¶ÔÏó
+			void* Allocate(size_t size);////´ÓThread CacheÖĞÉêÇësize¸öBytesµÄ¿Õ¼ä
+			void DeAllocate(void* ptr, size_t size);
 
-            void* FetchFromCentralCache(size_t index, size_t size); //å‘CentralCacheä¸­ç”³è¯·ç©ºé—´
-            void ListTooLong(FreeList& list, size_t size); //é‡Šæ”¾å¯¹è±¡å¯¼è‡´é“¾è¡¨è¿‡é•¿æ—¶ï¼Œ å½’è¿˜å†…å­˜åˆ°CentralCache
+			void* FetchFromCentralCache(size_t index, size_t size); //ÏòCentralCacheÖĞÉêÇë¿Õ¼ä
+			// void ListTooLong(FreeList& list, size_t size); //ÊÍ·Å¶ÔÏóµ¼ÖÂÁ´±í¹ı³¤Ê±£¬ ¹é»¹ÄÚ´æµ½CentralCache
 
-        private:
-            FreeList _freeLists[NFREELIST];
-        };
+		private:
+			FreeList _freeLists[NFREELIST];
+		};
 
-        //TLS: thread local storage
-        static _declspec(thread) ThreadCache* pTLSThreadCache = nullptr;
-    }
+		//TLS: thread local storage
+		static _declspec(thread) ThreadCache* pTLSThreadCache = nullptr;
+	}
 }

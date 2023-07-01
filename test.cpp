@@ -2,8 +2,7 @@
 // Created by Dell on 2023/6/29.
 //
 
-#include "include/objectpool.h"
-using namespace lh::mp;
+#include "objectpool.h"
 
 struct TreeNode
 {
@@ -19,14 +18,14 @@ struct TreeNode
 
 void TestObjectPool()
 {
-	// ç”³è¯·é‡Šæ”¾çš„è½®æ¬¡
+	// ÉêÇëÊÍ·ÅµÄÂÖ´Î
 	const size_t Rounds = 5;
-	// æ¯è½®ç”³è¯·é‡Šæ”¾å¤šå°‘æ¬¡
+	// Ã¿ÂÖÉêÇëÊÍ·Å¶àÉÙ´Î
 	const size_t N = 1000000;
 	size_t begin1 = clock();
 	std::vector<TreeNode*> v1;
 	v1.reserve(N);
-
+	//    std::cout << "111111111" << std::endl;
 	for (size_t j = 0; j < Rounds; ++j)
 	{
 		for (int i = 0; i < N; ++i)
@@ -59,11 +58,13 @@ void TestObjectPool()
 	size_t end2 = clock();
 	std::cout << "new cost time:" << end1 - begin1 << std::endl;
 	std::cout << "object pool cost time:" << end2 - begin2 << std::endl;
-    std::cout << "111111111" << std::endl;
+	// std::cout << "111111111" << std::endl;
 }
 
+/**
 int main() {
-    TestObjectPool();
+	TestObjectPool();
 
-    return 0;
+	return 0;
 }
+**/
