@@ -1,0 +1,3 @@
+/mnt/e/CODE/C++/memorypool/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/mnt/e/CODE/C++/memorypool/cmake-build-debug/CMakeFiles/edit_cache.dir
+/mnt/e/CODE/C++/memorypool/cmake-build-debug/CMakeFiles/memorypool.dir
