@@ -13,47 +13,47 @@ using namespace lh::mp;
 
 namespace lh {
     namespace mp {
-        template <class T> //Ò»´ÎÉêÇëT´óĞ¡µÄÄÚ´æ¿Õ¼ä
+        template <class T> //ä¸€æ¬¡ç”³è¯·Tå¤§å°çš„å†…å­˜ç©ºé—´
         class ObjectPool {
         public:
             T* New() {
                 T* obj;
-                if (_freelist != nullptr) {
-                    //Í·É¾
-                    obj = (T*)_freelist;
-                    _freelist = *(void**)_freelist;
+                if (_freeList != nullptr) {
+                    //å¤´åˆ 
+                    obj = (T*)_freeList;
+                    _freeList = *(void**)_freeList;
                 }
                 else {
                     if (_remainedBytes < sizeof(T)) {
-                        //µ±Ç°ÄÚ´æ³ØÖĞÃ»ÓĞ×ãÒÔ·ÖÅäµÄÄÚ´æ£¬ĞèÒªÉêÇë
-                        _remainedBytes = 8 * 1024; //ÉêÇë¶¨³¤£¨8Kb£©µÄÄÚ´æ¿Õ¼ä
-                        _memory = (char*)SystemAlloc(_remainedBytes >> PAGE_SHIFT); //ÉêÇë¶¨³¤£¨8Kb£©µÄÄÚ´æ¿Õ¼ä
+                        //å½“å‰å†…å­˜æ± ä¸­æ²¡æœ‰è¶³ä»¥åˆ†é…çš„å†…å­˜ï¼Œéœ€è¦ç”³è¯·
+                        _remainedBytes = 8 * 1024; //ç”³è¯·å®šé•¿ï¼ˆ8Kbï¼‰çš„å†…å­˜ç©ºé—´
+                        _memory = (char*)SystemAlloc(_remainedBytes >> PAGE_SHIFT); //ç”³è¯·å®šé•¿ï¼ˆ8Kbï¼‰çš„å†…å­˜ç©ºé—´
                     }
 
-                    //±£Ö¤Ò»´Î·ÖÅäµÄ¿Õ¼ä¹»´æ·ÅÏÂµ±Ç°Æ½Ì¨µÄÖ¸Õë
+                    //ä¿è¯ä¸€æ¬¡åˆ†é…çš„ç©ºé—´å¤Ÿå­˜æ”¾ä¸‹å½“å‰å¹³å°çš„æŒ‡é’ˆ
                     size_t unity = sizeof(T) < sizeof(void*) ? sizeof(void*) : sizeof(T);
                     obj = (T*)_memory;
                     _memory += unity;
                     _remainedBytes -= unity;
                 }
-                //new(obj) T ÊÇÒ»ÖÖ C++ ÖĞµÄ¶¨Î» new£¨placement new£©Óï·¨£¬Ëü¿ÉÒÔÔÚÖ¸¶¨µÄÄÚ´æµØÖ·ÉÏÎªÒ»¸ö¶ÔÏó·ÖÅäÄÚ´æ²¢µ÷ÓÃ¹¹Ôìº¯Êı¡£
-                // ¾ßÌåÀ´Ëµ£¬new(obj) T µÄº¬ÒåÊÇÔÚÄÚ´æµØÖ· obj ÉÏµ÷ÓÃÀàĞÍ T µÄ¹¹Ôìº¯ÊıÀ´´´½¨Ò»¸ö T ÀàĞÍµÄ¶ÔÏó£¬²¢·µ»Ø¸Ã¶ÔÏóµÄÖ¸Õë¡£
-                //¶¨Î»newÏÔÊ½µ÷ÓÃTÀàĞÍ¹¹Ôìº¯Êı
+                //new(obj) T æ˜¯ä¸€ç§ C++ ä¸­çš„å®šä½ newï¼ˆplacement newï¼‰è¯­æ³•ï¼Œå®ƒå¯ä»¥åœ¨æŒ‡å®šçš„å†…å­˜åœ°å€ä¸Šä¸ºä¸€ä¸ªå¯¹è±¡åˆ†é…å†…å­˜å¹¶è°ƒç”¨æ„é€ å‡½æ•°ã€‚
+                // å…·ä½“æ¥è¯´ï¼Œnew(obj) T çš„å«ä¹‰æ˜¯åœ¨å†…å­˜åœ°å€ obj ä¸Šè°ƒç”¨ç±»å‹ T çš„æ„é€ å‡½æ•°æ¥åˆ›å»ºä¸€ä¸ª T ç±»å‹çš„å¯¹è±¡ï¼Œå¹¶è¿”å›è¯¥å¯¹è±¡çš„æŒ‡é’ˆã€‚
+                //å®šä½newæ˜¾å¼è°ƒç”¨Tç±»å‹æ„é€ å‡½æ•°
                 new(obj) T;
                 return obj;
             }
 
             void Delete(T* obj) {
-                //ÏÔÊ½µ÷ÓÃobj¶ÔÏóµÄÎö¹¹º¯Êı,ÇåÀí¿Õ¼ä
+                //æ˜¾å¼è°ƒç”¨objå¯¹è±¡çš„ææ„å‡½æ•°,æ¸…ç†ç©ºé—´
                 obj->~T();
-                //½«objÄÚ´æ¿éÍ·²å
-                *(void**)obj = _freelist;
-                _freelist = obj;
+                //å°†objå†…å­˜å—å¤´æ’
+                *(void**)obj = _freeList;
+                _freeList = obj;
             }
         private:
-            char* _memory = nullptr; //´æ´¢Ò»´ÎÉêÇëÒ»´ó¿éµÄÄÚ´æ,char*ÀàĞÍ±ãÓÚ·ÖÅäÄÚ´æ
-            void* _freelist = nullptr; //½«ÊÍ·ÅµÄÄÚ´æ»ØÊÕÁ´½Ó
-            size_t _remainedBytes; //_memoryÖĞÊ£ÓàµÄÄÚ´æ¿Õ¼ä
+            char* _memory = nullptr; //å­˜å‚¨ä¸€æ¬¡ç”³è¯·ä¸€å¤§å—çš„å†…å­˜,char*ç±»å‹ä¾¿äºåˆ†é…å†…å­˜
+            void* _freeList = nullptr; //å°†é‡Šæ”¾çš„å†…å­˜å›æ”¶é“¾æ¥
+            size_t _remainedBytes; //_memoryä¸­å‰©ä½™çš„å†…å­˜ç©ºé—´
 
         };
     }

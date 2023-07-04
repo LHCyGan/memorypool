@@ -60,12 +60,12 @@ void TestConcurrentAlloc2()
 	void* p2 = ConcurrentAlloc(8);
 	std::cout << p2 << std::endl;
 }
-
-int main()
-{
-	//TestObjectPool();
-	//TLSTest();
-	//TestConcurrentAlloc1();
-	TestConcurrentAlloc2();
-	return 0;
-}
+//
+//int main()
+//{
+//	//TestObjectPool();
+//	//TLSTest();
+//	//TestConcurrentAlloc1();
+//	TestConcurrentAlloc2();
+//	return 0;
+//}

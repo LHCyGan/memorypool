@@ -34,6 +34,33 @@
 #### 3.页缓存（page cache）
 页缓存是中心缓存上一级的缓存，存储并分配以页为单位的内存，central cache中没有内存对象时，会从page cache中分配出一定数量的page，并切割成定长大小的小块内存，给central cache。当page cache中一个span的几个跨度页都回收以后，page cache会回收central cache中满足条件的span对象，并且合并相邻的页，组成更大的页，从而缓解内存碎片（外碎片）的问题。
 
+### 具体实现
+#### 1、Thread Cache核心实现
+thread cache是哈希桶结构，每个桶是一个根据桶位置映射的挂接内存块的自由链表，每个线程都会有一个thread cache对象，这样就可以保证线程在申请和释放对象时是无锁访问的。
+
+#### 申请与释放内存的规则及无锁访问
+- 申请内存
+当内存申请大小size不超过256KB，则先获取到线程本地存储的thread cache对象，计算size映射的哈希桶自由链表下标i。
+如果自由链表_freeLists[i]中有对象，则直接Pop一个内存对象返回。
+如果_freeLists[i]中没有对象时，则批量从central cache中获取一定数量的对象，插入到自由链表并返回一个对象。
+- 释放内存
+<ol>
+<li>当释放内存小于256kb时将内存释放回thread cache，计算size映射自由链表桶位置i，将对象Push到_freeLists[i]。</li>
+<li>当链表的长度过长，则回收一部分内存对象到central cache。</li>
+</ol>
+
+- tls - thread local storage \
+线程局部存储(tls)，是一种变量的存储方法，这个变量在它所在的线程内是全局可访问的，但是不能被其他线程访问到，这样就保持了数据的线程独立性。而熟知的全局变量，是所有线程都可以访问的，这样就不可避免需要锁来控制，增加了控制成本和代码复杂度。
+
+#### 2、Central Cache核心实现
+central cache也是一个哈希表结构，其映射关系与thread cache是一样的，不同的是central cache的哈希桶位置所挂接的是SpanList链表结构，不过每个桶下的span对象被切分成了一块块小内存挂接在span对象的自由链表freeList中。
+
+#### 申请与释放内存规则
+- 申请内存
+<ol>
+<li>当thread cache中没有内存后，就会向central cache中申请大块内存。这里的申请过程采用的是类似网络tcp协议拥塞控制的慢开始算法，而central cache中哈希映射的spanlist下挂着的span则向thread cache提供大块内存，而从span中取出对象给thread cache是需要加锁的，这里为了保证效率，提供的是桶锁。</li>
+</ol>
+
 ### 编译运行
 ```
 mkdir build && cd build
@@ -47,7 +74,9 @@ cmake ..
 make
 ```
 
+### 未使用基数树的性能测试
 
+![img](./assets/benchmark.png)
 
 ### TODO
 
@@ -55,4 +84,6 @@ make
 - [x]  支持windows和linux
 - [x]  实现初步三级缓存
 - [x]  单元测试
+- [x]  基准测试
+- [ ]  基数树优化
 

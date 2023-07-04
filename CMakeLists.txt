@@ -3,4 +3,4 @@ project(memorypool)
 
 set(CMAKE_CXX_STANDARD 11)
 file(GLOB_RECURSE SOURCES "include/*.h" )
-add_executable(memorypool unitest.cpp ${SOURCES})
+add_executable(memorypool unitest.cpp ${SOURCES} benchmark.cpp)

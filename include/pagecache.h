@@ -1,26 +1,39 @@
 #pragma once
 
 #include "common.h"
+#include "objectpool.h"
 using namespace lh::mp;
 
 namespace lh {
-	namespace mp {
-		class PageCache {
-		public:
-			static PageCache* GetInstance() {
-				return &_sInst;
-			}
+    namespace mp {
+        class PageCache {
+        public:
+            static PageCache* GetInstance() {
+                return &_sInst;
+            }
 
-			// »ñÈ¡Ò»¸ökÒ³µÄPageCache
-			Span* NewPage(size_t k);
-			//ÓëCentralCache²»Í¬µÄÊÇ£¬Èô´Ë´¦ÉèÖÃÍ°Ëø£¬»áÆµ·±µÄ¼ÓËø½âËø£¬¹ÊPageCacheÖĞÕûÌåÉèÖÃÒ»°ÑËø
-			std::mutex _pageMtx;
+            //å»ºç«‹ä»å¯¹è±¡åˆ°span*çš„æ˜ å°„
+            Span* MapObjectToSpan(void* obj);
 
-		private:
-			PageCache() {}
-			PageCache(const PageCache&) = delete;
-			static PageCache _sInst;
-			SpanList _spanlists[NPAGES];
-		};
-	}
+            //å°†CentralCacheå½’è¿˜çš„spané“¾æ¥åˆ°PageCacheå¯¹åº”çš„æ¡¶ä¸­ï¼Œå¹¶ä¸”è‹¥å…¶å‰åé¡µæœ‰ç©ºé—²ï¼Œåˆå¹¶ä¹‹
+            void RealeaseSpanToPageCache(Span* span);
+
+            // è·å–ä¸€ä¸ªké¡µçš„PageCache
+            Span* NewPage(size_t k);
+            //ä¸CentralCacheä¸åŒçš„æ˜¯ï¼Œè‹¥æ­¤å¤„è®¾ç½®æ¡¶é”ï¼Œä¼šé¢‘ç¹çš„åŠ é”è§£é”ï¼Œæ•…PageCacheä¸­æ•´ä½“è®¾ç½®ä¸€æŠŠé”
+            std::mutex _pageMtx;
+
+        private:
+            PageCache() {}
+            PageCache(const PageCache&) = delete;
+
+            //å®šä¹‰å®šé•¿çš„spanå†…å­˜æ± ä»¥è„±ç¦»ä½¿ç”¨new
+            ObjectPool<Span> _spanPool;
+
+            std::unordered_map<PAGE_ID, Span*> _idSpanMap;
+
+            static PageCache _sInst;
+            SpanList _spanlists[NPAGES];
+        };
+    }
 }
