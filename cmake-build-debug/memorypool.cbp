@@ -100,7 +100,13 @@
 		<Unit filename="/mnt/e/CODE/C++/memorypool/include/pagecache.h">
 			<Option target="memorypool"/>
 		</Unit>
+		<Unit filename="/mnt/e/CODE/C++/memorypool/include/pagemap.h">
+			<Option target="memorypool"/>
+		</Unit>
 		<Unit filename="/mnt/e/CODE/C++/memorypool/include/threadcache.h">
+			<Option target="memorypool"/>
+		</Unit>
+		<Unit filename="/mnt/e/CODE/C++/memorypool/pagecache.cpp">
 			<Option target="memorypool"/>
 		</Unit>
 		<Unit filename="/mnt/e/CODE/C++/memorypool/unitest.cpp">

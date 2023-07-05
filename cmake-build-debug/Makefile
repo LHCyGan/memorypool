@@ -150,6 +150,33 @@ benchmark.cpp.s:
 	$(MAKE) -f CMakeFiles/memorypool.dir/build.make CMakeFiles/memorypool.dir/benchmark.cpp.s
 .PHONY : benchmark.cpp.s
 
+pagecache.o: pagecache.cpp.o
+
+.PHONY : pagecache.o
+
+# target to build an object file
+pagecache.cpp.o:
+	$(MAKE) -f CMakeFiles/memorypool.dir/build.make CMakeFiles/memorypool.dir/pagecache.cpp.o
+.PHONY : pagecache.cpp.o
+
+pagecache.i: pagecache.cpp.i
+
+.PHONY : pagecache.i
+
+# target to preprocess a source file
+pagecache.cpp.i:
+	$(MAKE) -f CMakeFiles/memorypool.dir/build.make CMakeFiles/memorypool.dir/pagecache.cpp.i
+.PHONY : pagecache.cpp.i
+
+pagecache.s: pagecache.cpp.s
+
+.PHONY : pagecache.s
+
+# target to generate assembly for a file
+pagecache.cpp.s:
+	$(MAKE) -f CMakeFiles/memorypool.dir/build.make CMakeFiles/memorypool.dir/pagecache.cpp.s
+.PHONY : pagecache.cpp.s
+
 unitest.o: unitest.cpp.o
 
 .PHONY : unitest.o
@@ -189,6 +216,9 @@ help:
 	@echo "... benchmark.o"
 	@echo "... benchmark.i"
 	@echo "... benchmark.s"
+	@echo "... pagecache.o"
+	@echo "... pagecache.i"
+	@echo "... pagecache.s"
 	@echo "... unitest.o"
 	@echo "... unitest.i"
 	@echo "... unitest.s"

@@ -5,6 +5,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
   "/mnt/e/CODE/C++/memorypool/benchmark.cpp" "/mnt/e/CODE/C++/memorypool/cmake-build-debug/CMakeFiles/memorypool.dir/benchmark.cpp.o"
+  "/mnt/e/CODE/C++/memorypool/pagecache.cpp" "/mnt/e/CODE/C++/memorypool/cmake-build-debug/CMakeFiles/memorypool.dir/pagecache.cpp.o"
   "/mnt/e/CODE/C++/memorypool/unitest.cpp" "/mnt/e/CODE/C++/memorypool/cmake-build-debug/CMakeFiles/memorypool.dir/unitest.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
