@@ -39,11 +39,11 @@
 thread cache是哈希桶结构，每个桶是一个根据桶位置映射的挂接内存块的自由链表，每个线程都会有一个thread cache对象，这样就可以保证线程在申请和释放对象时是无锁访问的。
 
 #### 申请与释放内存的规则及无锁访问
-- 申请内存
+- ##### 申请内存
 当内存申请大小size不超过256KB，则先获取到线程本地存储的thread cache对象，计算size映射的哈希桶自由链表下标i。
 如果自由链表_freeLists[i]中有对象，则直接Pop一个内存对象返回。
 如果_freeLists[i]中没有对象时，则批量从central cache中获取一定数量的对象，插入到自由链表并返回一个对象。
-- 释放内存
+- ##### 释放内存
 <ol>
 <li>当释放内存小于256kb时将内存释放回thread cache，计算size映射自由链表桶位置i，将对象Push到_freeLists[i]。</li>
 <li>当链表的长度过长，则回收一部分内存对象到central cache。</li>
@@ -56,10 +56,32 @@ thread cache是哈希桶结构，每个桶是一个根据桶位置映射的挂�
 central cache也是一个哈希表结构，其映射关系与thread cache是一样的，不同的是central cache的哈希桶位置所挂接的是SpanList链表结构，不过每个桶下的span对象被切分成了一块块小内存挂接在span对象的自由链表freeList中。
 
 #### 申请与释放内存规则
-- 申请内存
+- ##### 申请内存
 <ol>
 <li>当thread cache中没有内存后，就会向central cache中申请大块内存。这里的申请过程采用的是类似网络tcp协议拥塞控制的慢开始算法，而central cache中哈希映射的spanlist下挂着的span则向thread cache提供大块内存，而从span中取出对象给thread cache是需要加锁的，这里为了保证效率，提供的是桶锁。</li>
+<li>当central cache中映射的spanlist下所挂接的所有span对象都没有内存后，则需要向page cache申请一块新的span对象，central cache拿到这块span对象后会按照所管理内存的大小将span对象划分成多块，再挂接到central cache的审判list中；然后再从这块新申请的span对象中去内存分配给thread cache。</li>
+<li>在这里，为了方便后续的回收，span对象每分配出一块内存，其成员变量_useCount就++；相反thread cache每释放归还一块内存后，_useCount就–。</li>
+
+- ##### 释放内存
+当thread_cache过长或者线程销毁，则会将内存释放回central cache中的，释放回来时–_useCount。
+当_useCount变为0后，说明所有分配出去的内存都归还回来了，那么就将这个span对象归还给page cache，page cache会对归还回来的span进行前后页合并。
 </ol>
+
+#### 3、Page Cache核心实现
+page cache与前两级缓存略有不同，其映射关系不再是哈希桶位置与自由链表或spanlist的映射，而是页号与spanlist的映射，这里我们设计的是128页的page cache。
+#### 申请与释放内存
+- ##### 申请内存
+<ol>
+<li>当central cache向page cache申请内存时，page cache先检查对应位置有没有span，如果没有则向更大页寻找一个span，如果找到则分裂成两个。比如：申请的是1页page，1页page后面没有挂span，则向后面寻找更大的span，假设在100页page位置找到一个span，则将100页page的span分裂为一个1页page span和一个99页page span。</li>
+<li></li>如果找到_spanList[128]都没有合适的span，则向系统使用mmap、brk或者是VirtualAlloc等方式申请128页page span挂在自由链表中，再重复1中的过程。</li>
+<li>需要注意的是central cache和page cache 的核心结构都是spanlist的哈希桶，但是他们是有本质区别的，central cache中哈希桶，是按跟thread cache一样的大小对齐关系映射的，他的spanlist中挂的span中的内存都被按映射关系切好链接成小块内存的自由链表。而page cache 中的spanlist则是按下标桶号映射的，也就是说第i号桶中挂的span都是i页内存。</li>
+</ol>
+
+- ##### 释放内存
+如果central cache释放回一个span，则依次寻找span的前后page id的没有在使用的空闲span，看是否可以合并，如果合并继续向前寻找。这样就可以将切小的内存合并收缩成大的span，减少内存碎片。
+
+
+
 
 ### 编译运行
 ```
@@ -78,6 +100,8 @@ make
 
 ![img](./assets/benchmark.png)
 
+### 使用单层基数树的性能测试
+![img](./assets/benchmark_2.png)
 ### TODO
 
 - [x]  定长的内存池
@@ -85,5 +109,5 @@ make
 - [x]  实现初步三级缓存
 - [x]  单元测试
 - [x]  基准测试
-- [ ]  基数树优化
+- [x]  基数树优化
 
